@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NYC Taxi Medallion Market Analysis - A comprehensive data science project analyzing taxi medallion economics and ride-sharing market dynamics from 2017-2023">
+    <meta name="keywords" content="NYC Taxi, Medallion Analysis, Data Science, Python, Transportation Economics">
+    <meta name="author" content="Data Science Portfolio">
+    <title>NYC Taxi Medallion Market Analysis</title>
+
+    <style>
+        :root {
+            --primary-color: #f7b731;
+            --secondary-color: #5f27cd;
+            --accent-color: #00d2d3;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --bg-white: #ffffff;
+            --border-color: #e1e8ed;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background-color: var(--bg-light);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header/Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            margin: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: white;
+            color: var(--secondary-color);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background-color: white;
+            color: var(--secondary-color);
+        }
+
+        /* Sections */
+        section {
+            padding: 60px 0;
+            background-color: var(--bg-white);
+            margin: 20px 0;
+        }
+
+        section:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-align: center;
+            color: var(--text-dark);
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            margin: 30px 0 15px;
+            color: var(--secondary-color);
+        }
+
+        /* Key Findings Cards */
+        .findings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .finding-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .finding-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .finding-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .finding-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin: 10px 0;
+        }
+
+        .finding-description {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Methodology Section */
+        .methodology-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .method-step {
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+            padding: 20px;
+            margin: 10px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            color: white;
+            font-weight: bold;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        /* Technologies Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .tech-item {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.3s;
+        }
+
+        .tech-item:hover {
+            border-color: var(--secondary-color);
+        }
+
+        .tech-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--text-dark);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .hero-stats {
+                gap: 20px;
+            }
+
+            .stat-number {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .methodology-steps {
+                flex-direction: column;
+            }
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: var(--secondary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: var(--bg-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            <h1>🚕 NYC Taxi Medallion Market Analysis</h1>
+            <p>A comprehensive data science project analyzing taxi medallion economics and ride-sharing market dynamics</p>
+
+            <div>
+                <a href="https://github.com/yourusername/medallions" class="btn btn-primary" target="_blank">View on GitHub</a>
+                <a href="https://github.com/yourusername/medallions/tree/main/notebooks" class="btn btn-secondary" target="_blank">View Notebooks</a>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat">
+                    <span class="stat-number">2,800+</span>
+                    <span class="stat-label">Transactions Analyzed</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">2017-2023</span>
+                    <span class="stat-label">Years Covered</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">100,000+</span>
+                    <span class="stat-label">Data Points</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">6</span>
+                    <span class="stat-label">Analysis Notebooks</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Findings Section -->
+    <section>
+        <div class="container">
+            <h2>🔍 Key Findings</h2>
+
+            <div class="findings-grid">
+                <div class="finding-card">
+                    <div class="finding-icon">🏚️</div>
+                    <div class="finding-value">64.2%</div>
+                    <h3>Foreclosure Rate</h3>
+                    <p class="finding-description">
+                        Nearly two-thirds of medallion transactions were foreclosures,
+                        indicating severe market distress in the traditional taxi industry.
+                    </p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">📉</div>
+                    <div class="finding-value">-0.649</div>
+                    <h3>Yellow Taxi Correlation</h3>
+                    <p class="finding-description">
+                        Strong negative correlation between total NYC rides and Yellow taxi market share,
+                        revealing declining competitive position.
+                    </p>
+                </div>
+
+                <div class="finding-card">
+                    <div class="finding-icon">📈</div>
+                    <div class="finding-value">+0.685</div>
+                    <h3>FHV High-Volume Growth</h3>
+                    <p class="finding-description">
+                        High-Volume FHV services (Uber/Lyft) show strong positive correlation
+                        with total market expansion, capturing new demand.
+                    </p>
+                </div>
+            </div>
+
+            <h3>Transaction Distribution</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Percentage</th>
+                        <th>Count</th>
+                        <th>Significance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🏚️ Foreclosures</td>
+                        <td><strong>64.2%</strong></td>
+                        <td>1,827</td>
+                        <td>Primary indicator of market collapse</td>
+                    </tr>
+                    <tr>
+                        <td>💼 Standard Sales</td>
+                        <td><strong>29.0%</strong></td>
+                        <td>826</td>
+                        <td>Regular market transactions</td>
+                    </tr>
+                    <tr>
+                        <td>👨‍👩‍👧 Estate Sales</td>
+                        <td><strong>4.1%</strong></td>
+                        <td>116</td>
+                        <td>Inheritance-related transfers</td>
+                    </tr>
+                    <tr>
+                        <td>💸 Bankruptcy</td>
+                        <td><strong>2.2%</strong></td>
+                        <td>63</td>
+                        <td>Financial distress indicators</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section>
+        <div class="container">
+            <h2>🔬 Methodology</h2>
+
+            <div class="methodology-steps">
+                <div class="method-step">
+                    <div class="step-number">1</div>
+                    <h3>Data Collection</h3>
+                    <p>Gathered 70+ monthly sheets from NYC TLC covering medallion transfers and ride statistics</p>
+                </div>
+
+                <div class="method-step">
+                    <div class="step-number">2</div>
+                    <h3>Data Cleaning</h3>
+                    <p>Standardized formats, handled missing values, removed duplicates and irrelevant transactions</p>
+                </div>
+
+                <div class="method-step">
+                    <div class="step-number">3</div>
+                    <h3>Statistical Analysis</h3>
+                    <p>Applied regression, correlation, and time series analysis using Python and statsmodels</p>
+                </div>
+
+                <div class="method-step">
+                    <div class="step-number">4</div>
+                    <h3>Visualization</h3>
+                    <p>Created comprehensive visualizations using Matplotlib and Seaborn for insight communication</p>
+                </div>
+            </div>
+
+            <h3>Statistical Techniques Used</h3>
+            <ul style="max-width: 600px; margin: 20px auto; line-height: 2;">
+                <li>📈 <strong>Ordinary Least Squares (OLS) Regression</strong> - Quantifying relationships</li>
+                <li>🔗 <strong>Pearson Correlation Analysis</strong> - Identifying market dynamics</li>
+                <li>📉 <strong>Time Series Decomposition</strong> - Trend and seasonality analysis</li>
+                <li>🔀 <strong>Cross-Sectional Comparison</strong> - License class performance</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Technologies Section -->
+    <section>
+        <div class="container">
+            <h2>🛠️ Technologies Used</h2>
+
+            <div class="tech-grid">
+                <div class="tech-item">
+                    <div class="tech-icon">🐍</div>
+                    <h4>Python 3.8+</h4>
+                    <p>Core language</p>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">🐼</div>
+                    <h4>Pandas</h4>
+                    <p>Data manipulation</p>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">📊</div>
+                    <h4>Matplotlib</h4>
+                    <p>Visualization</p>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">📈</div>
+                    <h4>Statsmodels</h4>
+                    <p>Statistical modeling</p>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">📓</div>
+                    <h4>Jupyter</h4>
+                    <p>Interactive analysis</p>
+                </div>
+
+                <div class="tech-item">
+                    <div class="tech-icon">🔢</div>
+                    <h4>NumPy</h4>
+                    <p>Numerical computing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Highlights -->
+    <section>
+        <div class="container">
+            <h2>📊 Project Highlights</h2>
+
+            <div style="max-width: 800px; margin: 0 auto;">
+                <h3>Business Context</h3>
+                <p style="font-size: 1.1rem; line-height: 1.8;">
+                    NYC taxi medallions were once valued at over <strong>$1 million</strong> but have experienced
+                    dramatic price decline due to ride-sharing competition. This analysis quantifies market distress,
+                    identifies competitive dynamics, and explores the relationship between overall market growth
+                    and traditional taxi operations.
+                </p>
+
+                <h3>Key Insights</h3>
+                <ul style="font-size: 1.05rem; line-height: 2;">
+                    <li>🚖 <strong>Yellow taxis</strong> demonstrate declining market position despite overall ride growth</li>
+                    <li>🚗 <strong>High-Volume FHV</strong> services capture the majority of market expansion</li>
+                    <li>📊 Traditional taxi operations show <strong>supply elasticity</strong> - fewer vehicles as market share declines</li>
+                    <li>⚠️ Medallion values reflect <strong>structural market shift</strong>, not temporary disruption</li>
+                </ul>
+
+                <h3>Skills Demonstrated</h3>
+                <ul style="font-size: 1.05rem; line-height: 2;">
+                    <li>✅ Data cleaning and preprocessing of complex multi-sheet Excel files</li>
+                    <li>✅ Statistical analysis and correlation identification</li>
+                    <li>✅ Time series analysis and trend visualization</li>
+                    <li>✅ Business insight generation from raw data</li>
+                    <li>✅ Professional documentation and reproducible research</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <h3>Get Started</h3>
+            <p>Explore the full analysis on GitHub</p>
+            <div style="margin: 30px 0;">
+                <a href="https://github.com/yourusername/medallions" class="btn btn-primary" target="_blank">View Repository</a>
+                <a href="https://github.com/yourusername/medallions/tree/main/notebooks" class="btn btn-secondary" target="_blank">Browse Notebooks</a>
+            </div>
+
+            <hr style="margin: 40px 0; opacity: 0.3;">
+
+            <p>&copy; 2025 Data Science Portfolio Project | Licensed under MIT</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/yourusername">GitHub</a> •
+                <a href="https://linkedin.com/in/yourprofile">LinkedIn</a> •
+                <a href="mailto:your.email@example.com">Email</a>
+            </p>
+
+            <p style="margin-top: 20px; font-size: 0.9rem; opacity: 0.7;">
+                Data sources: NYC Taxi & Limousine Commission (TLC)
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
